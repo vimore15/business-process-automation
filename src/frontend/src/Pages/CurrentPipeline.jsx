@@ -10,7 +10,9 @@ export default function Stages(props) {
 
     useEffect(() => {
         try {
-            axios.get('/api/config?id=pipelines').then(value => setPipelines(value.data.pipelines))
+            axios.get('/api/config?id=pipelines').then(value => {
+                setPipelines(value.data.pipelines)
+            })
         } catch (err) {
             console.log(err)
         }
@@ -25,7 +27,7 @@ export default function Stages(props) {
                     return (
                         <div style={{marginBottom : "100px"}}>
                             <Text weight="semibold" content={p.name} style={{ fontSize: "14px", display: "block", width: "100%", marginBottom: "20px", marginLeft : "100px" }} />
-                            <PipelinePreview theme={props.theme} stages={p.stages} />
+                            <PipelinePreview theme={props.theme} stages={p.stages} firstStage={p.firstStage} />
                         </div>
                     )
                 })

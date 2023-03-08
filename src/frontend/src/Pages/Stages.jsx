@@ -17,6 +17,8 @@ import VideoIndexerDialog from '../Components/Dialogs/VideoIndexerDialog';
 //import CopyDialog from './CopyDialog';
 import ToTxtDialog from '../Components/Dialogs/ToTxtDialog';
 import Prices from '../Components/Prices/Prices'
+import OpenAiGenericDialog from '../Components/Dialogs/OpenAiGenericDialog';
+import SpliceDocument from '../Components/Dialogs/SpliceDocument';
 
 import { sc } from '../Components/serviceCatalog'
 import { Button, Text } from '@fluentui/react-northstar'
@@ -38,7 +40,9 @@ export default function Stages(props) {
     const [hideChangeDataDialog, setHideChangeDataDialog] = useState(true)
     const [hideToTxtDialog, setHideToTxtDialog] = useState(true)
     const [hideSttDialog, setHideSttDialog] = useState(true)
+    const [hideOpenAiDialog, setHideOpenAiDialog] = useState(true)
     const [hideVideoIndexerDialog, setHideVideoIndexerDialog] = useState(true)
+    const [hideSpliceDocumentDialog, setHideSpliceDocumentDialog] = useState(true)
     const [currentOption, setCurrentOption] = useState(null)
     //const [price, setPrice] = useState(0)
     // const [numDocuments, setNumDocuments] = useState(0)
@@ -84,6 +88,7 @@ export default function Stages(props) {
             for (const p of currentPipelines.data.pipelines) {
                 if (p.name === props.selectedPipelineName) {
                     p.stages = stages.slice(1, stages.length)
+                    p.firstStage = stages[0]
                     break;
                 }
             }
@@ -104,7 +109,7 @@ export default function Stages(props) {
                     _options.push(serviceCatalog[k])
                     break;
                 }
-                if (previousStage.outputTypes.includes(acceptedInputType.toLowerCase())) {
+                if (previousStage.outputTypes.includes(acceptedInputType)) {
                     _options.push(serviceCatalog[k])
                     break;
                 }
@@ -151,28 +156,34 @@ export default function Stages(props) {
         } else if (event.name === 'changeOutput') {
             setCurrentOption(_.cloneDeep(event))
             setHideChangeDataDialog(false)
-        } else if (event.name === 'stt') {
+        } else if (event.name === 'stt' || event.name === 'sttBatch') {
             setCurrentOption(_.cloneDeep(event))
             setHideSttDialog(false)
         } else if (event.name === 'huggingFaceNER') {
             setCurrentOption(_.cloneDeep(event))
             setHideHuggingFaceDialog(false)
-        } else if (event.name === 'customFormRec') {
+        } else if (event.name === 'customFormRec' || event.name === 'customFormRecBatch') {
             setCurrentOption(_.cloneDeep(event))
             setHideFormRecDialog(false)
-        } else if (event.name === 'recognizeCustomEntities') {
+        } else if (event.name === 'recognizeCustomEntities' || event.name === 'recognizeCustomEntitiesBatch') {
             setCurrentOption(_.cloneDeep(event))
             setHideCustomNerDialog(false)
-        } else if (event.name === 'singleCategoryClassify') {
+        } else if (event.name === 'singleCategoryClassify' || event.name === 'singleCategoryClassifyBatch') {
             setCurrentOption(_.cloneDeep(event))
             setHideCustomSingleDialog(false)
-        } else if (event.name === 'multiCategoryClassify') {
+        } else if (event.name === 'multiCategoryClassify' || event.name === 'multipleCategoryClassifyBatch') {
             setCurrentOption(_.cloneDeep(event))
             setHideCustomMultiDialog(false)
         } else if (event.name === 'videoIndexer') {
             setCurrentOption(_.cloneDeep(event))
             setHideVideoIndexerDialog(false)
-        } else {
+        } else if (event.name === 'openaiGeneric') {
+            setCurrentOption(_.cloneDeep(event))
+            setHideOpenAiDialog(false)
+        }else if (event.name === 'spliceDocument') {
+            setCurrentOption(_.cloneDeep(event))
+            setHideSpliceDocumentDialog(false)
+        }else {
             addItemToPipeline(event)
         }
 
@@ -213,59 +224,12 @@ export default function Stages(props) {
                 <ChangeDataDialog hideDialog={hideChangeDataDialog} setHideDialog={setHideChangeDataDialog} items={stages} currentOption={currentOption} addItemToPipeline={addItemToPipeline} />
                 <ToTxtDialog hideDialog={hideToTxtDialog} setHideDialog={setHideToTxtDialog} currentOption={currentOption} addItemToPipeline={addItemToPipeline} />
                 <VideoIndexerDialog hideDialog={hideVideoIndexerDialog} setHideDialog={setHideVideoIndexerDialog} currentOption={currentOption} addItemToPipeline={addItemToPipeline} />
+                <OpenAiGenericDialog hideDialog={hideOpenAiDialog} setHideDialog={setHideOpenAiDialog} currentOption={currentOption} addItemToPipeline={addItemToPipeline} />
+                <SpliceDocument hideDialog={hideSpliceDocumentDialog} setHideDialog={setHideSpliceDocumentDialog} currentOption={currentOption} addItemToPipeline={addItemToPipeline} />
                 {renderOptions(options)}
             </>
         )
     }
-
-    // const estimatedPrice = () => {
-    //     return <>Estimated Monthly Price (not including Cognitive Search): <span style={{ color: "blue" }}>${price}</span></>
-    // }
-
-    // const onNumDocuments = (event, value) => {
-    //     isNumber = false
-    //     try {
-    //         // eslint-disable-next-line no-unused-vars
-    //         const temp = Number(value)
-    //         isNumber = true
-    //     } catch (err) {
-
-    //     }
-    //     if (isNumber) {
-    //         setNumDocuments(Number(value.value))
-    //     }
-
-    // }
-
-    // const onMinutesPerAudioFile = (event, value) => {
-    //     isNumber = false
-    //     try {
-    //         // eslint-disable-next-line no-unused-vars
-    //         const temp = Number(value)
-    //         isNumber = true
-    //     } catch (err) {
-
-    //     }
-    //     if (isNumber) {
-    //         setMinutesPerAudioFile(Number(value.value))
-    //     }
-
-    // }
-
-    // const onPagesPerDocument = (event, value) => {
-    //     isNumber = false
-    //     try {
-    //         // eslint-disable-next-line no-unused-vars
-    //         const temp = Number(value)
-    //         isNumber = true
-    //     } catch (err) {
-
-    //     }
-    //     if (isNumber) {
-    //         setPagesPerDocument(Number(value.value))
-    //     }
-
-    // }
 
     const legalMessage = "* Prices are estimates only and are not intended as actual price quotes. Actual pricing may vary depending on the type of agreement entered with Microsoft, date of purchase, and the currency exchange rate. Prices are calculated based on US dollars and converted using Thomson Reuters benchmark rates refreshed on the first day of each calendar month. Sign in to the Azure pricing calculator to see pricing based on your current program/offer with Microsoft. Contact an Azure sales specialist for more information on pricing or to request a price quote. See frequently asked questions about Azure pricing."
 

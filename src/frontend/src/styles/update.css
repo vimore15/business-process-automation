@@ -78,3 +78,13 @@ body {
     display: inline-block;
 }
 
+.hoverPipeline:hover{
+
+    cursor: pointer;
+}
+
+.openaifilenames:hover{
+    background-color: lightgray;
+    cursor: pointer;
+}
+
